@@ -36,6 +36,12 @@ jobs:
           echo "COMPOSE_PROFILES=$profiles" >> $GITHUB_ENV
           echo "ENABLE_ELASTIC=${{ inputs.with_elastic }}" >> $GITHUB_ENV
 
+      - name: Update ElasticSearchConnector Enabled in Config
+        if: inputs.with_elastic == 'true'
+        run: |
+          # Set ElasticSearchConnector.Enabled to true if with_elastic is true
+          sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' .github/workflows/overridable-config.toml
+
       - name: Start Docker Compose with Profiles
         run: docker compose up -d
 

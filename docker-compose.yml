@@ -88,15 +88,10 @@ services:
   chainsimulator:
     image: multiversx/chainsimulator
     container_name: chainsimulator
-    command: ["/bin/bash", "-c", "
-      if [[ ${ENABLE_ELASTIC} == 'true' ]]; then
-        sed -i 's|http://localhost:9200|http://elasticsearch:9200|g' /multiversx/overridable-config.toml;
-      else
-        sed -i '/ELASTIC_SEARCH_URL/d' /multiversx/overridable-config.toml;
-      fi;
-      cat /multiversx/overridable-config.toml;
+    command: [ "/bin/bash", "-c", "
+      # Run the simulator with the possibly modified config
       ./chainsimulator --node-override-config /multiversx/overridable-config.toml
-    "]
+    " ]
     volumes:
       - ./overridable-config.toml:/multiversx/overridable-config.toml
     ports:
