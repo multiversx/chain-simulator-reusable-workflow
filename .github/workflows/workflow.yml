@@ -48,14 +48,7 @@ jobs:
 
       - name: Start Docker Compose with Profiles
         run: |
-          cd .
-          ls -lh
-          cd ./chain-simulator-reusable-workflow
-          ls- lh
-          pwd
-          ls -lh
-          docker compose up -d
-          working-directory:./chain-simulator-reusable-workflow
+          docker compose -f ./chain-simulator-reusable-workflow/docker-compose.yml up -d
 
       - name: Check Service Status
         run: docker ps
