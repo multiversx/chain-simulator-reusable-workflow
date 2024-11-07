@@ -43,7 +43,9 @@ jobs:
           sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' .github/workflows/overridable-config.toml
 
       - name: Start Docker Compose with Profiles
-        run:  docker compose -f ./docker-compose.yml up -d
+        run: |
+          # Specify the location of the docker-compose.yml file
+          docker compose -f ./docker-compose.yml up -d
 
       - name: Check Service Status
         run: docker ps
