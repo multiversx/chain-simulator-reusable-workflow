@@ -44,8 +44,8 @@ jobs:
           
           # Set ElasticSearch settings if needed
           if [[ "${{ inputs.with_elastic }}" == "true" ]]; then
-            sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' temp-repo/.github/workflows/overridable-config.toml
-            sed -i 's|ElasticSearchConnector.URL", Value = "http://localhost:9200|ElasticSearchConnector.URL", Value = "http://elasticsearch:9200|g' temp-repo/.github/workflows/overridable-config.toml
+            sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' temp-repo/.github/workflows/docker/overridable-config.toml
+            sed -i 's|ElasticSearchConnector.URL", Value = "http://localhost:9200|ElasticSearchConnector.URL", Value = "http://elasticsearch:9200|g' temp-repo/.github/workflows/docker/overridable-config.toml
           fi
 
           # Other necessary config modifications can be added here
@@ -55,10 +55,10 @@ jobs:
           echo "Copying docker-compose.yml and overridable-config.toml to the final repository"
           
           # Copy the docker-compose template
-          cp temp-repo/.github/workflows/docker/docker-compose-template.yml ./docker/docker-compose.yml
+          cp temp-repo/.github/workflows/docker/docker-compose.yml ./docker/docker-compose.yml
           
           # Copy the modified overridable config
-          cp temp-repo/.github/workflows/overridable-config.toml ./docker/overridable-config.toml
+          cp temp-repo/.github/workflows/docker/overridable-config.toml ./docker/overridable-config.toml
 
       - name: Clean up
         run: |
