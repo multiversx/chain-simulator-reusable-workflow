@@ -45,7 +45,7 @@ jobs:
       - name: Start Docker Compose with Profiles
         run: |
           # Specify the location of the docker-compose.yml file
-          docker compose -f ./docker-compose.yml up -d
+          docker compose up -d
 
       - name: Check Service Status
         run: docker ps
