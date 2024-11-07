@@ -20,8 +20,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+      - name: Clone chain-simulator-reusable-workflow repository
+        uses: actions/checkout@v4
+        with:
+          repository: multiversx/chain-simulator-reusable-workflow
+          path: ./chain-simulator-reusable-workflow
+          ref: first-version
 
       - name: Set up Docker Compose Profiles
         run: |
@@ -51,7 +55,7 @@ jobs:
           pwd
           ls -lh
           docker compose up -d
-          working-directory:.
+          working-directory:./chain-simulator-reusable-workflow
 
       - name: Check Service Status
         run: docker ps
