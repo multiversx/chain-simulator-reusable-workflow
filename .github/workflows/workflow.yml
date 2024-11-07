@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Docker Compose Profiles
         run: |
@@ -37,10 +37,10 @@ jobs:
           echo "ENABLE_ELASTIC=${{ inputs.with_elastic }}" >> $GITHUB_ENV
 
       - name: Start Docker Compose with Profiles
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Check Service Status
-        run: docker-compose ps
+        run: docker compose ps
 
       - name: Health Check on Chainsimulator
         run: |
