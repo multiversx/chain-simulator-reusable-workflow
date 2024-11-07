@@ -20,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+
       - name: Clone chain-simulator-reusable-workflow repository
         uses: actions/checkout@v4
         with:
