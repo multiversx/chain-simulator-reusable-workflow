@@ -1,0 +1,49 @@
+# .github/workflows/start-containers.yml
+name: Start Chain Simulator with optional services
+
+on:
+  workflow_call:
+    inputs:
+      with_notifier:
+        description: 'Enable notifier services'
+        required: false
+        type: boolean
+        default: false
+      with_elastic:
+        description: 'Enable elasticsearch services'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  start-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Compose Profiles
+        run: |
+          # Set profiles based on input flags
+          profiles="chainsimulator"  # Default profile
+          if [[ "${{ inputs.with_notifier }}" == "true" ]]; then
+            profiles="$profiles,notifier"
+          fi
+          if [[ "${{ inputs.with_elastic }}" == "true" ]]; then
+            profiles="$profiles,elastic"
+          fi
+          echo "COMPOSE_PROFILES=$profiles" >> $GITHUB_ENV
+          echo "ENABLE_ELASTIC=${{ inputs.with_elastic }}" >> $GITHUB_ENV
+
+      - name: Start Docker Compose with Profiles
+        run: docker-compose up -d
+
+      - name: Check Service Status
+        run: docker-compose ps
+
+      - name: Health Check on Chainsimulator
+        run: |
+          # Optional sleep to ensure chainsimulator is up before checking
+          sleep 10
+          curl http://localhost:8085/simulator/observers
