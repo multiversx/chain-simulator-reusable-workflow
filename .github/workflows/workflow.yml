@@ -43,10 +43,10 @@ jobs:
           sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' .github/workflows/overridable-config.toml
 
       - name: Start Docker Compose with Profiles
-        run: docker compose up -f "docker-compose.yml" -d
+        run:  docker compose -f ./docker-compose.yml up -d
 
       - name: Check Service Status
-        run: docker compose -f "docker-compose.yml" ps
+        run: docker ps
 
       - name: Health Check on Chainsimulator
         run: |
