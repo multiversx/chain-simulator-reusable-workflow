@@ -1,63 +1,72 @@
-# .github/workflows/start-containers.yml
-name: Start Chain Simulator with optional services
+name: Prepare Docker Compose Configuration for Chain Simulator
 
 on:
   workflow_call:
     inputs:
+      with_elastic:
+        description: 'Enable Elasticsearch services'
+        required: false
+        type: boolean
+        default: false
       with_notifier:
         description: 'Enable notifier services'
         required: false
         type: boolean
         default: false
-      with_elastic:
-        description: 'Enable elasticsearch services'
-        required: false
-        type: boolean
-        default: false
 
 jobs:
-  start-docker:
+  prepare-docker:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clone repository
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Clone chain-simulator-reusable-workflow repository
-        uses: actions/checkout@v4
-        with:
-          repository: multiversx/chain-simulator-reusable-workflow
-          path: ./chain-simulator-reusable-workflow
-          ref: first-version
-
-      - name: Set up Docker Compose Profiles
+      - name: Set up environment variables for profiles
         run: |
-          # Set profiles based on input flags
           profiles="chainsimulator"  # Default profile
-          if [[ "${{ inputs.with_notifier }}" == "true" ]]; then
-            profiles="$profiles,notifier"
-          fi
           if [[ "${{ inputs.with_elastic }}" == "true" ]]; then
             profiles="$profiles,elastic"
+          fi
+          if [[ "${{ inputs.with_notifier }}" == "true" ]]; then
+            profiles="$profiles,notifier"
           fi
           echo "COMPOSE_PROFILES=$profiles" >> $GITHUB_ENV
           echo "ENABLE_ELASTIC=${{ inputs.with_elastic }}" >> $GITHUB_ENV
 
-      - name: Update ElasticSearchConnector Enabled in Config
-        if: inputs.with_elastic == 'true'
+      - name: Clone the reusable workflow repo
         run: |
-          # Set ElasticSearchConnector.Enabled to true if with_elastic is true
-          sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' .github/workflows/overridable-config.toml
+          git clone --depth 1 --branch first-version https://github.com/multiversx/chain-simulator-reusable-workflow.git temp-repo
 
-      - name: Start Docker Compose with Profiles
+      - name: Modify the overridable-config.toml file
         run: |
-          docker compose -f ./chain-simulator-reusable-workflow/docker-compose.yml up -d
+          echo "Modifying overridable-config.toml based on the input parameters"
+          
+          # Set ElasticSearch settings if needed
+          if [[ "${{ inputs.with_elastic }}" == "true" ]]; then
+            sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' temp-repo/.github/workflows/overridable-config.toml
+            sed -i 's|ElasticSearchConnector.URL", Value = "http://localhost:9200|ElasticSearchConnector.URL", Value = "http://elasticsearch:9200|g' temp-repo/.github/workflows/overridable-config.toml
+          fi
 
-      - name: Check Service Status
-        run: docker ps
+          # Other necessary config modifications can be added here
 
-      - name: Health Check on Chainsimulator
+      - name: Copy docker-compose and modified config to final repo
         run: |
-          # Optional sleep to ensure chainsimulator is up before checking
-          sleep 10
-          curl http://localhost:8085/simulator/observers
+          echo "Copying docker-compose.yml and overridable-config.toml to the final repository"
+          
+          # Copy the docker-compose template
+          cp temp-repo/.github/workflows/docker/docker-compose-template.yml ./docker/docker-compose.yml
+          
+          # Copy the modified overridable config
+          cp temp-repo/.github/workflows/overridable-config.toml ./docker/overridable-config.toml
+
+      - name: Clean up
+        run: |
+          rm -rf temp-repo  # Clean up the temporary repo
+
+      - name: Output modified files for verification
+        run: |
+          echo "Final docker-compose.yml:"
+          cat ./docker/docker-compose.yml
+          echo "Modified overridable-config.toml:"
+          cat ./docker/overridable-config.toml
