@@ -72,3 +72,9 @@ jobs:
           cat ./docker/docker-compose.yml
           echo "Modified overridable-config.toml:"
           cat ./docker/overridable-config.toml
+
+      - name: Upload Docker directory as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker
+          path: ./docker/
