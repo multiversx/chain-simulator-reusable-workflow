@@ -94,6 +94,8 @@ services:
     " ]
     volumes:
       - ./overridable-config.toml:/multiversx/overridable-config.toml
+    environment:
+      ELASTIC_SEARCH_URL: 'http://localhost:9200'
     ports:
       - "8085:8085"
     healthcheck:
