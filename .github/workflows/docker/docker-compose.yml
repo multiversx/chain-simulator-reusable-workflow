@@ -88,10 +88,7 @@ services:
   chainsimulator:
     image: multiversx/chainsimulator
     container_name: chainsimulator
-    command: [ "/bin/bash", "-c", "
-      # Run the simulator with the possibly modified config
-      ./chainsimulator --node-override-config /multiversx/overridable-config.toml
-    " ]
+    command: [ "/bin/bash", "-c", "./chainsimulator --node-override-config /multiversx/overridable-config.toml"]
     volumes:
       - ./overridable-config.toml:/multiversx/overridable-config.toml
     environment:
