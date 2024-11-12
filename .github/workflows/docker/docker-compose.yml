@@ -72,11 +72,13 @@ services:
       - elastic  # Only start with elastic profile
 
   chainsimulator:
-    image: multiversx/chainsimulator
     container_name: chainsimulator
-    command: ["--node-override-config", "./overridable-config.toml"]
+    image: multiversx/chainsimulator
+    command: [ "--node-override-config", "./overridable-config.toml" ]
     volumes:
       - ./overridable-config.toml:/multiversx/overridable-config.toml
+    depends_on:
+      - elasticsearch
     environment:
       ELASTIC_SEARCH_URL: 'http://localhost:9200'
     ports:
