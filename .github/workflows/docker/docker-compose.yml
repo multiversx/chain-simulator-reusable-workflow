@@ -71,20 +71,6 @@ services:
     profiles:
       - elastic  # Only start with elastic profile
 
-  elastic-indexer:
-    image: multiversx/elastic-indexer:latest
-    container_name: elastic-indexer
-    depends_on:
-      elasticsearch:
-        condition: service_healthy
-    entrypoint: >
-      /bin/bash -c "sed -i 's|http://localhost:9200|http://elasticsearch:9200|g' ./config/prefs.toml
-      && sed -i 's|url = \"localhost:22111\"|url = \"0.0.0.0:22111\"|g' ./config/prefs.toml
-      && cat ./config/prefs.toml
-      && ./elasticindexer -log-level *:DEBUG"
-    profiles:
-      - elastic  # Only start with elastic profile
-
   chainsimulator:
     image: multiversx/chainsimulator
     container_name: chainsimulator
