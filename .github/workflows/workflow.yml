@@ -44,7 +44,7 @@ jobs:
           
           # Set ElasticSearch settings if needed
           if [[ "${{ inputs.with_elastic }}" == "true" ]]; then
-            sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' temp-repo/.github/workflows/docker/overridable-config.toml
+            sed -i 's|\(ElasticSearchConnector.Enabled", Value = \)false|\1true|g' temp-repo/.github/workflows/docker/overridable-config.toml
             sed -i 's|ElasticSearchConnector.URL", Value = "http://localhost:9200|ElasticSearchConnector.URL", Value = "http://elasticsearch:9200|g' temp-repo/.github/workflows/docker/overridable-config.toml
           fi
 
