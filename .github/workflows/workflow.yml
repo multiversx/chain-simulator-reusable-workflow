@@ -36,7 +36,7 @@ jobs:
 
       - name: Clone the reusable workflow repo
         run: |
-          git clone --depth 1 --branch first-version https://github.com/multiversx/chain-simulator-reusable-workflow.git temp-repo
+          git clone --depth 1 --branch "${{ github.ref_name }}" https://github.com/multiversx/chain-simulator-reusable-workflow.git temp-repo
 
       - name: Modify the overridable-config.toml file
         run: |
@@ -47,8 +47,6 @@ jobs:
             sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' temp-repo/.github/workflows/docker/overridable-config.toml
             sed -i 's|ElasticSearchConnector.URL", Value = "http://localhost:9200|ElasticSearchConnector.URL", Value = "http://elasticsearch:9200|g' temp-repo/.github/workflows/docker/overridable-config.toml
           fi
-
-          # Other necessary config modifications can be added here
 
       - name: Copy docker-compose and modified config to final repo
         run: |
