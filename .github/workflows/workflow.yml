@@ -1,0 +1,78 @@
+name: Prepare Docker Compose Configuration for Chain Simulator
+
+on:
+  workflow_call:
+    inputs:
+      with_elastic:
+        description: 'Enable Elasticsearch services'
+        required: false
+        type: boolean
+        default: false
+      with_notifier:
+        description: 'Enable notifier services'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  prepare-docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up environment variables for profiles
+        run: |
+          profiles="chainsimulator"  # Default profile
+          if [[ "${{ inputs.with_elastic }}" == "true" ]]; then
+            profiles="$profiles,elastic"
+          fi
+          if [[ "${{ inputs.with_notifier }}" == "true" ]]; then
+            profiles="$profiles,notifier"
+          fi
+          echo "COMPOSE_PROFILES=$profiles" >> $GITHUB_ENV
+          echo "ENABLE_ELASTIC=${{ inputs.with_elastic }}" >> $GITHUB_ENV
+
+      - name: Clone the reusable workflow repo
+        run: |
+          git clone --depth 1 --branch v1 https://github.com/multiversx/chain-simulator-reusable-workflow.git temp-repo
+
+      - name: Modify the overridable-config.toml file
+        run: |
+          echo "Modifying overridable-config.toml based on the input parameters"
+          
+          # Set ElasticSearch settings if needed
+          if [[ "${{ inputs.with_elastic }}" == "true" ]]; then
+            sed -i 's|ElasticSearchConnector.Enabled", Value = "false|ElasticSearchConnector.Enabled", Value = "true|g' temp-repo/.github/workflows/docker/overridable-config.toml
+            sed -i 's|ElasticSearchConnector.URL", Value = "http://localhost:9200|ElasticSearchConnector.URL", Value = "http://elasticsearch:9200|g' temp-repo/.github/workflows/docker/overridable-config.toml
+          fi
+
+      - name: Copy docker-compose and modified config to final repo
+        run: |
+          echo "Copying docker-compose.yml and overridable-config.toml to the final repository"
+          
+          mkdir -p ./docker
+          
+          # Copy the docker-compose template
+          cp temp-repo/.github/workflows/docker/docker-compose.yml ./docker/docker-compose.yml
+          
+          # Copy the modified overridable config
+          cp temp-repo/.github/workflows/docker/overridable-config.toml ./docker/overridable-config.toml
+
+      - name: Clean up
+        run: |
+          rm -rf temp-repo  # Clean up the temporary repo
+
+      - name: Output modified files for verification
+        run: |
+          echo "Final docker-compose.yml:"
+          cat ./docker/docker-compose.yml
+          echo "Modified overridable-config.toml:"
+          cat ./docker/overridable-config.toml
+
+      - name: Upload Docker directory as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: docker
+          path: ./docker/
