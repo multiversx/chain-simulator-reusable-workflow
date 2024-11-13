@@ -51,10 +51,10 @@ services:
       - notifier  # Only start with notifier profile
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.1
-    container_name: elasticsearch-container
     ports:
-      - 127.0.0.1:9200:9200
+      - "9200:9200"
+    container_name: es-container
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.16.1
     environment:
       - "discovery.type=single-node"
       - "xpack.security.enabled=false"
@@ -64,7 +64,7 @@ services:
         soft: -1
         hard: -1
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://127.0.0.1:9200"]
+      test: [ "CMD", "curl", "-f", "http://127.0.0.1:9200" ]
       interval: 10s
       timeout: 5s
       retries: 5
