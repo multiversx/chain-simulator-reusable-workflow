@@ -36,7 +36,7 @@ jobs:
 
       - name: Clone the reusable workflow repo
         run: |
-          git clone --depth 1 --branch "${{ github.action_ref }}" https://github.com/multiversx/chain-simulator-reusable-workflow.git temp-repo
+          git clone --depth 1 --branch "${{ github.ref }}" https://github.com/multiversx/chain-simulator-reusable-workflow.git temp-repo
 
       - name: Modify the overridable-config.toml file
         run: |
